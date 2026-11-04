@@ -1,10 +1,11 @@
-package com.example.kalkulator // Jeśli Twój pakiet to com.example.calculator, zmień literę
+package com.example.kalkulator
 
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -32,9 +34,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+// Importy z folderu ui/theme:
+import com.example.kalkulator.ui.theme.CalculatorTheme
+import com.example.kalkulator.ui.theme.getButtonColors
 
 // ==========================================
-// 1. STRUKTURA DANYCH PRZYCISKÓW (Zadania 2 i 3)
+// 1. STRUKTURA DANYCH PRZYCISKÓW
 // ==========================================
 enum class ButtonRole {
     DIGIT,
@@ -52,7 +57,6 @@ data class CalcButton(
     val isDelete: Boolean = false
 )
 
-// Blok podstawowy: 5 wierszy x 4 kolumny
 val basicButtons: List<List<CalcButton>> = listOf(
     listOf(
         CalcButton(label = "C", role = ButtonRole.ACTION, isClear = true),
@@ -86,7 +90,6 @@ val basicButtons: List<List<CalcButton>> = listOf(
     )
 )
 
-// Blok naukowy: 5 wierszy x 2 kolumny (widoczny tylko w orientacji poziomej)
 val scientificButtons: List<List<CalcButton>> = listOf(
     listOf(
         CalcButton(label = "sin", insertText = "sin(", role = ButtonRole.SCIENTIFIC),
@@ -111,10 +114,8 @@ val scientificButtons: List<List<CalcButton>> = listOf(
 )
 
 // ==========================================
-// 2. KOMPONENTY WIDOKU (Zadania 2 i 3)
+// 2. KOMPONENTY WIDOKU
 // ==========================================
-
-// Pole działania z automatycznym dopasowaniem i przewijaniem długich wyrażeń
 @Composable
 fun DisplayField(
     expression: String,
@@ -135,7 +136,7 @@ fun DisplayField(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        tonalElevation = 2.dp
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
     ) {
         Box(
             modifier = Modifier
@@ -157,7 +158,6 @@ fun DisplayField(
     }
 }
 
-// Pojedynczy komponent siatki przycisków wykorzystywany w pionie i poziomie
 @Composable
 fun CalculatorButtonGrid(
     rows: List<List<CalcButton>>,
@@ -181,7 +181,9 @@ fun CalculatorButtonGrid(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight(),
-                        shape = RoundedCornerShape(14.dp)
+                        shape = RoundedCornerShape(14.dp),
+                        colors = getButtonColors(btn.role), // Funkcja z Theme.kt
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
                     ) {
                         Text(
                             text = btn.label,
@@ -194,7 +196,6 @@ fun CalculatorButtonGrid(
     }
 }
 
-// Główny ekran adaptacyjny (Zadanie 3)
 @Composable
 fun CalculatorScreen() {
     var expression by rememberSaveable { mutableStateOf("") }
@@ -213,6 +214,7 @@ fun CalculatorScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
             .safeDrawingPadding()
             .padding(12.dp)
     ) {
@@ -224,7 +226,6 @@ fun CalculatorScreen() {
         )
 
         if (isLandscape) {
-            // W poziomie: blok naukowy obok bloku podstawowego
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -247,7 +248,6 @@ fun CalculatorScreen() {
                 )
             }
         } else {
-            // W pionie: wyłącznie blok podstawowy
             CalculatorButtonGrid(
                 rows = basicButtons,
                 modifier = Modifier
@@ -260,17 +260,17 @@ fun CalculatorScreen() {
 }
 
 // ==========================================
-// 3. PUNKT WEJŚCIA APLIKACJI
+// 3. PUNKT STARTOWY
 // ==========================================
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MaterialTheme {
+            CalculatorTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = MaterialTheme.colorScheme.surface
                 ) {
                     CalculatorScreen()
                 }
