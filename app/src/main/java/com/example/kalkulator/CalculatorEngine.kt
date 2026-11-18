@@ -16,7 +16,6 @@ object CalculatorEngine {
             return ""
         }
 
-        // Zamiana polskiego przecinka dziesiętnego na kropkę wymaganą przez bibliotekę
         val normalized = trimmed.replace(',', '.')
 
         // Wyrażenie zakończone operatorem lub otwartym nawiasem jest niedokończone

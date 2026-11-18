@@ -4,14 +4,14 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.example.kalkulator.ButtonRole // Import roli z MainActivity
+import androidx.compose.ui.text.font.FontFamily
+import com.example.kalkulator.ButtonRole
 
-
-// --- PALETA DLA TRYBU JASNEGO (LIGHT) ---
 val PrimaryLight = Color(0xFF006874)
 val OnPrimaryLight = Color(0xFFFFFFFF)
 val PrimaryContainerLight = Color(0xFF97F0FF)
@@ -32,7 +32,6 @@ val OnSurfaceLight = Color(0xFF191C1D)
 val SurfaceVariantLight = Color(0xFFDBE4E6)
 val OnSurfaceVariantLight = Color(0xFF3F484A)
 
-// --- PALETA DLA TRYBU CIEMNEGO (DARK) ---
 val PrimaryDark = Color(0xFF4FD8EB)
 val OnPrimaryDark = Color(0xFF00363D)
 val PrimaryContainerDark = Color(0xFF004F58)
@@ -53,7 +52,6 @@ val OnSurfaceDark = Color(0xFFE1E3E3)
 val SurfaceVariantDark = Color(0xFF3F484A)
 val OnSurfaceVariantDark = Color(0xFFBFC8CA)
 
-// Zestawy schematów barw Material 3
 val LightColorScheme = lightColorScheme(
     primary = PrimaryLight,
     onPrimary = OnPrimaryLight,
@@ -92,20 +90,40 @@ val DarkColorScheme = darkColorScheme(
     onSurfaceVariant = OnSurfaceVariantDark
 )
 
+private val DefaultTypography = Typography()
+
+// Typografia z cyframi tabelarycznymi (tnum) eliminującymi drganie szerokości tekstu
+val CalculatorTypography = Typography(
+    displayMedium = DefaultTypography.displayMedium.copy(
+        fontFamily = FontFamily.Monospace,
+        fontFeatureSettings = "tnum"
+    ),
+    headlineMedium = DefaultTypography.headlineMedium.copy(
+        fontFamily = FontFamily.Monospace,
+        fontFeatureSettings = "tnum"
+    ),
+    headlineSmall = DefaultTypography.headlineSmall.copy(
+        fontFamily = FontFamily.Monospace,
+        fontFeatureSettings = "tnum"
+    ),
+    titleMedium = DefaultTypography.titleMedium.copy(
+        fontFeatureSettings = "tnum"
+    )
+)
+
 @Composable
 fun CalculatorTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    // Dynamic color celowo wyłączony, aby wymusić świadomie zaprojektowany motyw
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
     MaterialTheme(
         colorScheme = colorScheme,
+        typography = CalculatorTypography,
         content = content
     )
 }
 
-// Mapowanie ról barwnych przycisków
 @Composable
 fun getButtonColors(role: ButtonRole): ButtonColors {
     return when (role) {
