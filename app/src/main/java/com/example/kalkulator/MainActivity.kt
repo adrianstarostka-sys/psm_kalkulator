@@ -2,6 +2,7 @@ package com.example.kalkulator
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -34,13 +35,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-// Importy z folderu ui/theme:
 import com.example.kalkulator.ui.theme.CalculatorTheme
 import com.example.kalkulator.ui.theme.getButtonColors
 
-// ==========================================
-// 1. STRUKTURA DANYCH PRZYCISKÓW
-// ==========================================
 enum class ButtonRole {
     DIGIT,
     OPERATOR,
@@ -84,7 +81,7 @@ val basicButtons: List<List<CalcButton>> = listOf(
     ),
     listOf(
         CalcButton(label = "0", role = ButtonRole.DIGIT),
-        CalcButton(label = ".", role = ButtonRole.DIGIT),
+        CalcButton(label = ",", role = ButtonRole.DIGIT),
         CalcButton(label = "=", role = ButtonRole.EQUALS),
         CalcButton(label = "+", role = ButtonRole.OPERATOR)
     )
@@ -105,7 +102,7 @@ val scientificButtons: List<List<CalcButton>> = listOf(
     ),
     listOf(
         CalcButton(label = "ln", insertText = "ln(", role = ButtonRole.SCIENTIFIC),
-        CalcButton(label = "log", insertText = "log(", role = ButtonRole.SCIENTIFIC)
+        CalcButton(label = "log", insertText = "log10(", role = ButtonRole.SCIENTIFIC)
     ),
     listOf(
         CalcButton(label = "e", insertText = "e", role = ButtonRole.SCIENTIFIC),
@@ -113,9 +110,6 @@ val scientificButtons: List<List<CalcButton>> = listOf(
     )
 )
 
-// ==========================================
-// 2. KOMPONENTY WIDOKU
-// ==========================================
 @Composable
 fun DisplayField(
     expression: String,
@@ -141,7 +135,7 @@ fun DisplayField(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 10.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             contentAlignment = Alignment.BottomEnd
         ) {
             Text(
@@ -182,7 +176,7 @@ fun CalculatorButtonGrid(
                             .weight(1f)
                             .fillMaxHeight(),
                         shape = RoundedCornerShape(14.dp),
-                        colors = getButtonColors(btn.role), // Funkcja z Theme.kt
+                        colors = getButtonColors(btn.role),
                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
                     ) {
                         Text(
@@ -198,6 +192,7 @@ fun CalculatorButtonGrid(
 
 @Composable
 fun CalculatorScreen() {
+    // rememberSaveable zapisuje stan w Bundle przed zniszczeniem aktywności
     var expression by rememberSaveable { mutableStateOf("") }
 
     val onButtonClick: (CalcButton) -> Unit = { btn ->
@@ -259,9 +254,6 @@ fun CalculatorScreen() {
     }
 }
 
-// ==========================================
-// 3. PUNKT STARTOWY
-// ==========================================
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -275,6 +267,15 @@ class MainActivity : ComponentActivity() {
                     CalculatorScreen()
                 }
             }
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        Log.d("CALC_STATE", "onSaveInstanceState -> zawartość Bundle:")
+        for (key in outState.keySet()) {
+            Log.d("CALC_STATE", "Klucz: $key | Wartość: ${outState.get(key)}")
         }
     }
 }

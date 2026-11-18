@@ -1,4 +1,4 @@
-package com.example.kalkulator.ui.theme // Jeśli Twoja paczka bazowa to com.example.calculator, zmień nazwę
+package com.example.kalkulator.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ButtonColors
@@ -10,10 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.example.kalkulator.ButtonRole // Import roli z MainActivity
 
-// =====================================================================
-// ZADANIE 4: WŁASNA PALETA BARW MATERIAL 3 (TRYB JASNY I CIEMNY)
-// Kolor bazowy: Deep Teal (#006874)
-// =====================================================================
 
 // --- PALETA DLA TRYBU JASNEGO (LIGHT) ---
 val PrimaryLight = Color(0xFF006874)
@@ -109,7 +105,7 @@ fun CalculatorTheme(
     )
 }
 
-// Mapowanie ról barwnych przycisków (spełnia kryteria kontrastu WCAG > 4.5:1)
+// Mapowanie ról barwnych przycisków
 @Composable
 fun getButtonColors(role: ButtonRole): ButtonColors {
     return when (role) {
