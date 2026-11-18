@@ -37,6 +37,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.kalkulator.ui.theme.CalculatorTheme
 import com.example.kalkulator.ui.theme.getButtonColors
+import org.mariuszgromada.math.mxparser.Expression
+import org.mariuszgromada.math.mxparser.License
+import java.math.BigDecimal
 
 enum class ButtonRole {
     DIGIT,
@@ -192,13 +195,32 @@ fun CalculatorButtonGrid(
 
 @Composable
 fun CalculatorScreen() {
-    // rememberSaveable zapisuje stan w Bundle przed zniszczeniem aktywności
     var expression by rememberSaveable { mutableStateOf("") }
 
     val onButtonClick: (CalcButton) -> Unit = { btn ->
         when {
             btn.isClear -> expression = ""
             btn.isDelete -> if (expression.isNotEmpty()) expression = expression.dropLast(1)
+            btn.role == ButtonRole.EQUALS -> {
+                if (expression.isNotBlank()) {
+                    val normalized = expression.replace(',', '.')
+                    val expr = Expression(normalized)
+                    if (expr.checkSyntax()) {
+                        val result = expr.calculate()
+                        expression = when {
+                            result.isNaN() || result.isInfinite() -> {
+                                if (expr.errorMessage.contains("Division by zero", ignoreCase = true) || normalized.contains("/0")) {
+                                    "Błąd: dzielenie przez 0"
+                                } else {
+                                    "Błąd dziedziny"
+                                }
+                            }
+                            result == 0.0 -> "0"
+                            else -> BigDecimal.valueOf(result).stripTrailingZeros().toPlainString()
+                        }
+                    }
+                }
+            }
             else -> expression += btn.insertText
         }
     }
@@ -257,6 +279,10 @@ fun CalculatorScreen() {
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Deklaracja niekomercyjnego użycia biblioteki mXparser
+        License.iConfirmNonCommercialUse("Kalkulator - Projekt Studencki")
+
         enableEdgeToEdge()
         setContent {
             CalculatorTheme {
